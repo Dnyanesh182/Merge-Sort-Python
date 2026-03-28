@@ -1,41 +1,37 @@
-# UC4 – Handle sorting of duplicate elements correctly while maintaining stability
+# UC5 – Apply Merge Sort on list of strings using lexicographical order
 
-from typing import List, Tuple
+from typing import List
 
 
 class MergeSort:
-    """Class to implement stable Merge Sort."""
+    """Class to implement Merge Sort for strings."""
 
     @staticmethod
-    def sort(data: List[Tuple[int, str]]) -> List[Tuple[int, str]]:
+    def sort(data: List[str]) -> List[str]:
         """
-        Sorts list of tuples based on first element while maintaining stability.
+        Sorts a list of strings lexicographically.
 
-        :param data: List of tuples (value, identifier)
-        :return: Stable sorted list
+        :param data: List of strings
+        :return: Sorted list
         """
         if len(data) <= 1:
             return data
 
         mid: int = len(data) // 2
-        left: List[Tuple[int, str]] = MergeSort.sort(data[:mid])
-        right: List[Tuple[int, str]] = MergeSort.sort(data[mid:])
+        left: List[str] = MergeSort.sort(data[:mid])
+        right: List[str] = MergeSort.sort(data[mid:])
 
         return MergeSort._merge(left, right)
 
     @staticmethod
-    def _merge(
-        left: List[Tuple[int, str]],
-        right: List[Tuple[int, str]]
-    ) -> List[Tuple[int, str]]:
-        """Merge step preserving stability."""
-        merged: List[Tuple[int, str]] = []
+    def _merge(left: List[str], right: List[str]) -> List[str]:
+        """Merge two sorted string lists."""
+        merged: List[str] = []
         i: int = 0
         j: int = 0
 
         while i < len(left) and j < len(right):
-            # Stable: pick left when equal
-            if left[i][0] <= right[j][0]:
+            if left[i] <= right[j]:
                 merged.append(left[i])
                 i += 1
             else:
@@ -50,19 +46,11 @@ class MergeSort:
 
 def main() -> None:
     """Main execution function."""
-    data: List[Tuple[int, str]] = [
-        (5, "A"),
-        (3, "B"),
-        (5, "C"),
-        (2, "D"),
-        (3, "E"),
-    ]
+    data: List[str] = ["banana", "apple", "cherry", "date"]
 
     print("Original List:", data)
-
-    sorted_data: List[Tuple[int, str]] = MergeSort.sort(data.copy())
-
-    print("Sorted List (Stable):", sorted_data)
+    sorted_data: List[str] = MergeSort.sort(data.copy())
+    print("Sorted List:", sorted_data)
 
 
 if __name__ == "__main__":
