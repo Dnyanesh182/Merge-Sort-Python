@@ -1,37 +1,51 @@
-# UC5 – Apply Merge Sort on list of strings using lexicographical order
+# UC6 – Sort custom objects using Merge Sort with key (e.g., sort by age)
 
-from typing import List
+from typing import List, Callable, TypeVar
+
+T = TypeVar("T")
+
+
+class Person:
+    """Represents a person with name and age."""
+
+    def __init__(self, name: str, age: int) -> None:
+        self.name = name
+        self.age = age
+
+    def __repr__(self) -> str:
+        return f"({self.name}, {self.age})"
 
 
 class MergeSort:
-    """Class to implement Merge Sort for strings."""
+    """Class to implement Merge Sort for custom objects."""
 
     @staticmethod
-    def sort(data: List[str]) -> List[str]:
+    def sort(data: List[T], key: Callable[[T], int]) -> List[T]:
         """
-        Sorts a list of strings lexicographically.
+        Sorts objects using Merge Sort based on a key.
 
-        :param data: List of strings
+        :param data: List of objects
+        :param key: Function to extract comparison key
         :return: Sorted list
         """
         if len(data) <= 1:
             return data
 
         mid: int = len(data) // 2
-        left: List[str] = MergeSort.sort(data[:mid])
-        right: List[str] = MergeSort.sort(data[mid:])
+        left: List[T] = MergeSort.sort(data[:mid], key)
+        right: List[T] = MergeSort.sort(data[mid:], key)
 
-        return MergeSort._merge(left, right)
+        return MergeSort._merge(left, right, key)
 
     @staticmethod
-    def _merge(left: List[str], right: List[str]) -> List[str]:
-        """Merge two sorted string lists."""
-        merged: List[str] = []
+    def _merge(left: List[T], right: List[T], key: Callable[[T], int]) -> List[T]:
+        """Merge two sorted lists using key."""
+        merged: List[T] = []
         i: int = 0
         j: int = 0
 
         while i < len(left) and j < len(right):
-            if left[i] <= right[j]:
+            if key(left[i]) <= key(right[j]):
                 merged.append(left[i])
                 i += 1
             else:
@@ -46,11 +60,20 @@ class MergeSort:
 
 def main() -> None:
     """Main execution function."""
-    data: List[str] = ["banana", "apple", "cherry", "date"]
+    people: List[Person] = [
+        Person("Alice", 30),
+        Person("Bob", 25),
+        Person("Charlie", 30),
+        Person("David", 20),
+    ]
 
-    print("Original List:", data)
-    sorted_data: List[str] = MergeSort.sort(data.copy())
-    print("Sorted List:", sorted_data)
+    print("Original List:", people)
+
+    sorted_people: List[Person] = MergeSort.sort(
+        people.copy(), key=lambda person: person.age
+    )
+
+    print("Sorted List (by age):", sorted_people)
 
 
 if __name__ == "__main__":
