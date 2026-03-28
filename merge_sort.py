@@ -1,51 +1,33 @@
-# UC6 – Sort custom objects using Merge Sort with key (e.g., sort by age)
+# UC7 – Analyze time and space complexity of Merge Sort with different input sizes
 
-from typing import List, Callable, TypeVar
-
-T = TypeVar("T")
-
-
-class Person:
-    """Represents a person with name and age."""
-
-    def __init__(self, name: str, age: int) -> None:
-        self.name = name
-        self.age = age
-
-    def __repr__(self) -> str:
-        return f"({self.name}, {self.age})"
+from typing import List, Tuple
+import time
+import random
+import sys
 
 
 class MergeSort:
-    """Class to implement Merge Sort for custom objects."""
+    """Class to implement Merge Sort."""
 
     @staticmethod
-    def sort(data: List[T], key: Callable[[T], int]) -> List[T]:
-        """
-        Sorts objects using Merge Sort based on a key.
-
-        :param data: List of objects
-        :param key: Function to extract comparison key
-        :return: Sorted list
-        """
+    def sort(data: List[int]) -> List[int]:
         if len(data) <= 1:
             return data
 
         mid: int = len(data) // 2
-        left: List[T] = MergeSort.sort(data[:mid], key)
-        right: List[T] = MergeSort.sort(data[mid:], key)
+        left: List[int] = MergeSort.sort(data[:mid])
+        right: List[int] = MergeSort.sort(data[mid:])
 
-        return MergeSort._merge(left, right, key)
+        return MergeSort._merge(left, right)
 
     @staticmethod
-    def _merge(left: List[T], right: List[T], key: Callable[[T], int]) -> List[T]:
-        """Merge two sorted lists using key."""
-        merged: List[T] = []
+    def _merge(left: List[int], right: List[int]) -> List[int]:
+        merged: List[int] = []
         i: int = 0
         j: int = 0
 
         while i < len(left) and j < len(right):
-            if key(left[i]) <= key(right[j]):
+            if left[i] <= right[j]:
                 merged.append(left[i])
                 i += 1
             else:
@@ -58,22 +40,30 @@ class MergeSort:
         return merged
 
 
+def analyze_performance(sizes: List[int]) -> None:
+    """Analyze time and space for Merge Sort."""
+    for size in sizes:
+        data: List[int] = [random.randint(1, 1000) for _ in range(size)]
+
+        # Time measurement
+        start_time: float = time.time()
+        MergeSort.sort(data.copy())
+        end_time: float = time.time()
+
+        # Space estimation (approx)
+        space_usage: int = sys.getsizeof(data)
+
+        print(
+            f"Input Size: {size}, Time: {end_time - start_time:.6f}s, Space: {space_usage} bytes"
+        )
+
+
 def main() -> None:
     """Main execution function."""
-    people: List[Person] = [
-        Person("Alice", 30),
-        Person("Bob", 25),
-        Person("Charlie", 30),
-        Person("David", 20),
-    ]
+    sizes: List[int] = [10, 100, 1000, 5000]
 
-    print("Original List:", people)
-
-    sorted_people: List[Person] = MergeSort.sort(
-        people.copy(), key=lambda person: person.age
-    )
-
-    print("Sorted List (by age):", sorted_people)
+    print("Merge Sort Complexity Analysis:")
+    analyze_performance(sizes)
 
 
 if __name__ == "__main__":
