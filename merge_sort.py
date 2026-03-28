@@ -1,31 +1,24 @@
-# UC7 – Analyze time and space complexity of Merge Sort with different input sizes
+# UC8 – Compare Merge Sort performance with Bubble Sort and Selection Sort
 
-from typing import List, Tuple
+from typing import List
 import time
 import random
-import sys
 
 
 class MergeSort:
-    """Class to implement Merge Sort."""
-
     @staticmethod
     def sort(data: List[int]) -> List[int]:
         if len(data) <= 1:
             return data
-
-        mid: int = len(data) // 2
-        left: List[int] = MergeSort.sort(data[:mid])
-        right: List[int] = MergeSort.sort(data[mid:])
-
+        mid = len(data) // 2
+        left = MergeSort.sort(data[:mid])
+        right = MergeSort.sort(data[mid:])
         return MergeSort._merge(left, right)
 
     @staticmethod
     def _merge(left: List[int], right: List[int]) -> List[int]:
         merged: List[int] = []
-        i: int = 0
-        j: int = 0
-
+        i = j = 0
         while i < len(left) and j < len(right):
             if left[i] <= right[j]:
                 merged.append(left[i])
@@ -33,37 +26,73 @@ class MergeSort:
             else:
                 merged.append(right[j])
                 j += 1
-
         merged.extend(left[i:])
         merged.extend(right[j:])
-
         return merged
 
 
-def analyze_performance(sizes: List[int]) -> None:
-    """Analyze time and space for Merge Sort."""
-    for size in sizes:
-        data: List[int] = [random.randint(1, 1000) for _ in range(size)]
+class BubbleSort:
+    @staticmethod
+    def sort(data: List[int]) -> List[int]:
+        n = len(data)
+        for i in range(n):
+            swapped = False
+            for j in range(0, n - i - 1):
+                if data[j] > data[j + 1]:
+                    data[j], data[j + 1] = data[j + 1], data[j]
+                    swapped = True
+            if not swapped:
+                break
+        return data
 
-        # Time measurement
-        start_time: float = time.time()
-        MergeSort.sort(data.copy())
-        end_time: float = time.time()
 
-        # Space estimation (approx)
-        space_usage: int = sys.getsizeof(data)
+class SelectionSort:
+    @staticmethod
+    def sort(data: List[int]) -> List[int]:
+        n = len(data)
+        for i in range(n):
+            min_index = i
+            for j in range(i + 1, n):
+                if data[j] < data[min_index]:
+                    min_index = j
+            if min_index != i:
+                data[i], data[min_index] = data[min_index], data[i]
+        return data
 
-        print(
-            f"Input Size: {size}, Time: {end_time - start_time:.6f}s, Space: {space_usage} bytes"
-        )
+
+def compare(size: int) -> None:
+    """Compare performance of sorting algorithms."""
+    data: List[int] = [random.randint(1, 1000) for _ in range(size)]
+
+    # Merge Sort
+    start = time.time()
+    MergeSort.sort(data.copy())
+    merge_time = time.time() - start
+
+    # Bubble Sort
+    start = time.time()
+    BubbleSort.sort(data.copy())
+    bubble_time = time.time() - start
+
+    # Selection Sort
+    start = time.time()
+    SelectionSort.sort(data.copy())
+    selection_time = time.time() - start
+
+    print(f"Input Size: {size}")
+    print(f"Merge Sort: {merge_time:.6f}s")
+    print(f"Bubble Sort: {bubble_time:.6f}s")
+    print(f"Selection Sort: {selection_time:.6f}s")
+    print("-" * 40)
 
 
 def main() -> None:
     """Main execution function."""
-    sizes: List[int] = [10, 100, 1000, 5000]
+    sizes: List[int] = [100, 500, 1000]
 
-    print("Merge Sort Complexity Analysis:")
-    analyze_performance(sizes)
+    print("Performance Comparison of Sorting Algorithms:")
+    for size in sizes:
+        compare(size)
 
 
 if __name__ == "__main__":
