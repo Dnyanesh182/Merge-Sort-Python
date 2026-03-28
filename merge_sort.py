@@ -1,42 +1,41 @@
-# UC3 – Count number of comparisons performed during merging process
+# UC4 – Handle sorting of duplicate elements correctly while maintaining stability
 
 from typing import List, Tuple
 
 
 class MergeSort:
-    """Class to implement Merge Sort with comparison counting."""
+    """Class to implement stable Merge Sort."""
 
     @staticmethod
-    def sort(data: List[int]) -> Tuple[List[int], int]:
+    def sort(data: List[Tuple[int, str]]) -> List[Tuple[int, str]]:
         """
-        Sorts a list and counts comparisons.
+        Sorts list of tuples based on first element while maintaining stability.
 
-        :param data: List of integers
-        :return: Tuple of (sorted list, comparison count)
+        :param data: List of tuples (value, identifier)
+        :return: Stable sorted list
         """
         if len(data) <= 1:
-            return data, 0
+            return data
 
         mid: int = len(data) // 2
-        left, left_count = MergeSort.sort(data[:mid])
-        right, right_count = MergeSort.sort(data[mid:])
+        left: List[Tuple[int, str]] = MergeSort.sort(data[:mid])
+        right: List[Tuple[int, str]] = MergeSort.sort(data[mid:])
 
-        merged, merge_count = MergeSort._merge(left, right)
-
-        total_count: int = left_count + right_count + merge_count
-        return merged, total_count
+        return MergeSort._merge(left, right)
 
     @staticmethod
-    def _merge(left: List[int], right: List[int]) -> Tuple[List[int], int]:
-        """Merges two sorted lists and counts comparisons."""
-        merged: List[int] = []
+    def _merge(
+        left: List[Tuple[int, str]],
+        right: List[Tuple[int, str]]
+    ) -> List[Tuple[int, str]]:
+        """Merge step preserving stability."""
+        merged: List[Tuple[int, str]] = []
         i: int = 0
         j: int = 0
-        comparisons: int = 0
 
         while i < len(left) and j < len(right):
-            comparisons += 1
-            if left[i] <= right[j]:
+            # Stable: pick left when equal
+            if left[i][0] <= right[j][0]:
                 merged.append(left[i])
                 i += 1
             else:
@@ -46,19 +45,24 @@ class MergeSort:
         merged.extend(left[i:])
         merged.extend(right[j:])
 
-        return merged, comparisons
+        return merged
 
 
 def main() -> None:
     """Main execution function."""
-    data: List[int] = [64, 34, 25, 12, 22, 11, 90]
+    data: List[Tuple[int, str]] = [
+        (5, "A"),
+        (3, "B"),
+        (5, "C"),
+        (2, "D"),
+        (3, "E"),
+    ]
 
     print("Original List:", data)
 
-    sorted_data, comparisons = MergeSort.sort(data.copy())
+    sorted_data: List[Tuple[int, str]] = MergeSort.sort(data.copy())
 
-    print("Sorted List:", sorted_data)
-    print("Total Comparisons:", comparisons)
+    print("Sorted List (Stable):", sorted_data)
 
 
 if __name__ == "__main__":
