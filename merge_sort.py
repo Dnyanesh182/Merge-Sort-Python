@@ -1,15 +1,15 @@
-# UC1 – Implement basic Merge Sort to sort an array in ascending order using divide and conquer
+# UC2 – Modify Merge Sort to sort array in descending order
 
 from typing import List
 
 
 class MergeSort:
-    """Class to implement Merge Sort."""
+    """Class to implement Merge Sort in descending order."""
 
     @staticmethod
     def sort(data: List[int]) -> List[int]:
         """
-        Sorts a list in ascending order using Merge Sort.
+        Sorts a list in descending order using Merge Sort.
 
         :param data: List of integers
         :return: Sorted list
@@ -25,13 +25,13 @@ class MergeSort:
 
     @staticmethod
     def _merge(left: List[int], right: List[int]) -> List[int]:
-        """Merges two sorted lists."""
+        """Merges two sorted lists in descending order."""
         merged: List[int] = []
         i: int = 0
         j: int = 0
 
         while i < len(left) and j < len(right):
-            if left[i] <= right[j]:
+            if left[i] >= right[j]:  # descending comparison
                 merged.append(left[i])
                 i += 1
             else:
@@ -50,7 +50,7 @@ def main() -> None:
 
     print("Original List:", data)
     sorted_data: List[int] = MergeSort.sort(data.copy())
-    print("Sorted List:", sorted_data)
+    print("Sorted List (Descending):", sorted_data)
 
 
 if __name__ == "__main__":
