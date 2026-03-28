@@ -1,62 +1,69 @@
-# UC9 – Implement in-place Merge Sort optimization (reduce extra space usage)
+# UC10 – Refactor Merge Sort implementation using clean code practices and reusable functions
 
-from typing import List
+from typing import List, TypeVar, Callable, Optional
+
+T = TypeVar("T")
 
 
 class MergeSort:
-    """Class to implement in-place Merge Sort."""
+    """Refactored, generic Merge Sort implementation."""
 
     @staticmethod
-    def sort(data: List[int]) -> List[int]:
+    def sort(
+        data: List[T],
+        key: Optional[Callable[[T], int]] = None,
+        reverse: bool = False,
+    ) -> List[T]:
         """
-        Sorts list using in-place Merge Sort.
+        Generic Merge Sort with key and reverse support.
 
-        :param data: List of integers
+        :param data: List of elements
+        :param key: Optional key function
+        :param reverse: Sort descending if True
         :return: Sorted list
         """
         if len(data) <= 1:
             return data
 
-        MergeSort._merge_sort(data, 0, len(data) - 1)
-        return data
+        key_func: Callable[[T], int] = key if key else lambda x: x
+
+        mid: int = len(data) // 2
+        left: List[T] = MergeSort.sort(data[:mid], key_func, reverse)
+        right: List[T] = MergeSort.sort(data[mid:], key_func, reverse)
+
+        return MergeSort._merge(left, right, key_func, reverse)
 
     @staticmethod
-    def _merge_sort(data: List[int], left: int, right: int) -> None:
-        if left >= right:
-            return
+    def _merge(
+        left: List[T],
+        right: List[T],
+        key: Callable[[T], int],
+        reverse: bool,
+    ) -> List[T]:
+        """Reusable merge logic."""
+        merged: List[T] = []
+        i: int = 0
+        j: int = 0
 
-        mid: int = (left + right) // 2
+        while i < len(left) and j < len(right):
+            left_val = key(left[i])
+            right_val = key(right[j])
 
-        MergeSort._merge_sort(data, left, mid)
-        MergeSort._merge_sort(data, mid + 1, right)
-        MergeSort._merge(data, left, mid, right)
+            should_take_left: bool = (
+                left_val <= right_val if not reverse else left_val >= right_val
+            )
 
-    @staticmethod
-    def _merge(data: List[int], left: int, mid: int, right: int) -> None:
-        """Merge using temporary buffer within bounds."""
-        temp: List[int] = []
-        i: int = left
-        j: int = mid + 1
-
-        while i <= mid and j <= right:
-            if data[i] <= data[j]:
-                temp.append(data[i])
+            if should_take_left:
+                merged.append(left[i])
                 i += 1
             else:
-                temp.append(data[j])
+                merged.append(right[j])
                 j += 1
 
-        while i <= mid:
-            temp.append(data[i])
-            i += 1
+        merged.extend(left[i:])
+        merged.extend(right[j:])
 
-        while j <= right:
-            temp.append(data[j])
-            j += 1
-
-        # Copy back to original array
-        for idx, val in enumerate(temp):
-            data[left + idx] = val
+        return merged
 
 
 def main() -> None:
@@ -65,9 +72,11 @@ def main() -> None:
 
     print("Original List:", data)
 
-    sorted_data: List[int] = MergeSort.sort(data.copy())
+    asc_sorted = MergeSort.sort(data.copy())
+    desc_sorted = MergeSort.sort(data.copy(), reverse=True)
 
-    print("Sorted List:", sorted_data)
+    print("Ascending:", asc_sorted)
+    print("Descending:", desc_sorted)
 
 
 if __name__ == "__main__":
